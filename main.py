@@ -2,7 +2,7 @@ import os
 import telebot
 
 API_KEY = os.environ.get('API_KEY')
-bot = telebot.TeleBot("1840179260:AAHMolRuDNe0lWdJf_t1GsIPt3IdVZWrHhI")
+bot = telebot.TeleBot("API_KEY")
 
 @bot.message_handler(commands="Greet")
 def greet(message):
@@ -13,5 +13,5 @@ def greet(message):
 def hello(message):
     bot.send_message(message.chat.id, "Yo")
 
-    
+
 bot.polling()
