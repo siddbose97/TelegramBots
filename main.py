@@ -3,12 +3,37 @@ load_dotenv()
 
 import os
 import telebot
+from telebot import types
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
 API_key = os.environ.get('API_KEY')
 bot = telebot.TeleBot(API_key)
 
-@bot.message_handler(commands="aed")
+# #==================================
+
+# def gen_markup():
+#     markup = InlineKeyboardMarkup()
+#     markup.row_width = 2
+#     markup.add(InlineKeyboardButton("Yes", callback_data="cb_yes"),
+#                                InlineKeyboardButton("No", callback_data="cb_no"))
+#     return markup
+
+# @bot.callback_query_handler(func=lambda call: True)
+# def callback_query(call):
+#     if call.data == "cb_yes":
+#         bot.answer_callback_query(call.id, "Answer is Yes")
+#     elif call.data == "cb_no":
+#         bot.answer_callback_query(call.id, "Answer is No")
+
+# @bot.message_handler(func=lambda message: True)
+# def message_handler(message):
+#     bot.send_message(message.chat.id, "Yes/no?", reply_markup=gen_markup())
+
+#===============
+
+
+@bot.message_handler(commands=['aed'])
 def aed(message):
     words = message.text
     wordsWithoutCommand = words.replace("/aed ", "").split()
@@ -19,13 +44,20 @@ def aed(message):
         url ="https://lh3.googleusercontent.com/uYRsIwxwJ4aaQV5DKWIh6Pr3duUiL5xAmJnXl8_K-Tt0NFINmgfAUdi89ZjYPAYyk77iPpOinspDJ9JPajPUoKoYBY248HTTO2eMJo2UxuF8E4exNq4ABv0pNMRDXBt1G7ShWNkiKc7hGHBH6FTaTTBCPeBGe5InfymR-4_sFUqSXIGRU8BiIn1XHvVUUW61gohjP3dlCJwzTaAyxjExLtQevIKiMBDam0wnq8TubTkmSOtDfLC_xvMuNVpw3T7GGMZKuxZ07cOHpRenlKTd1l4NpZOR-2-1IikI_Fa65QT9OFGDxp9PknCWB6fYOTiJk40PtKi0Thl4TeAamT3cPVGDmv7YHDh6dHupgxFJV8d-kZzhR20LnhRve917DYJxhAUU0fp3X3K3WbbdBXdm8eS3sooV55Ppu_vORVhnB0DbvtGZt9hQ3ufVNXPnFA9hCAFLY7jcOVWUnokQd5ZuZLvDWsBylSt1l_MiwCgjm4bW9fgjPr6dNewU3SspWnq2Ga_cMuDSivhq-Lkaj6_BkC-BGr8fw0B5HzIonIIWrod1nUYDWUEgKHcsGFVujX2I9jP7toDa4izRXumRZYoTl7sYyeCO6r6doVfUKBvS6hFr01b2tG9SwyHjHdofbDkx8kmZeCYUWEpTjTFim_GlXUNe4iwVMiZBeZ0jItjBUYcSLHh8o7-DqA_E87CZDCuiby4Vi1a-7HzG-OhX8Sm9Ub32HQ=w828-h501-no?authuser=1"
     elif camp == "kc3":
         url = "https://lh3.googleusercontent.com/-78QT2XudDyQlv84s3sJRs4e2A2CWoXLTX9n6sUM9Wc8SU6JO07PjMuvjhF41Iz47vEhI0OjQxtv6kM8X85pRl92xCPz3w9Faws-hEqSCtnT7DoCpJD1PosHvohVXItHoI4a53V0mgaMaI0t9Pj69hYO1NP5edwNLWbNw19ij4B8B0KR329nXgJEqt0hhdNKoPEemcjBsrpNNINMByGxDFGFmcZk8uLw0bspdiIuHrgDgGTfCFKGjA_DS7NJm_tc9j86cyFk-BsJncUpcPpjVJXmlikJGltQRxRJpljrlfxcK8svzIRlVYRYSXavzmkesyF80bjmLsYYD4Ht5O1dVbnc-JNCZPIL3c1f0EC9_ccZNf9K9DVjYvVVabbeUsobGMuf2y9bW0LePusAxXssPeXwcMuFO9UU7q-lGoRSaWrKxwfHWCvDG5b6YQ4RllE72iwT-eDrmlTG-RzV3vT9JSG3g_XOgY4XMJDCzUMMnH-Jh2duaqdBuQxyj7_iav9SEhPPjCtVSvVnJtDefsteeplOlziQleooo89pSML1mWz5tBUKcEtX8WRfA4cJeT6joam4a4BTi2BpaDDqNzisyc7RfbHu7y5o9TICNk-GnYxw873-FqT1DBN_tErjlOGfG4WFRw_hM_mrQnfJZndg98-H40s5XpigQAwIiECdLHudEdkeGcEDDmpOwRSIN16acUzNvYP7anwn8tfY7-eCh534WQ=w828-h775-no?authuser=1"
+    else:
+        url = "https://lh3.googleusercontent.com/-78QT2XudDyQlv84s3sJRs4e2A2CWoXLTX9n6sUM9Wc8SU6JO07PjMuvjhF41Iz47vEhI0OjQxtv6kM8X85pRl92xCPz3w9Faws-hEqSCtnT7DoCpJD1PosHvohVXItHoI4a53V0mgaMaI0t9Pj69hYO1NP5edwNLWbNw19ij4B8B0KR329nXgJEqt0hhdNKoPEemcjBsrpNNINMByGxDFGFmcZk8uLw0bspdiIuHrgDgGTfCFKGjA_DS7NJm_tc9j86cyFk-BsJncUpcPpjVJXmlikJGltQRxRJpljrlfxcK8svzIRlVYRYSXavzmkesyF80bjmLsYYD4Ht5O1dVbnc-JNCZPIL3c1f0EC9_ccZNf9K9DVjYvVVabbeUsobGMuf2y9bW0LePusAxXssPeXwcMuFO9UU7q-lGoRSaWrKxwfHWCvDG5b6YQ4RllE72iwT-eDrmlTG-RzV3vT9JSG3g_XOgY4XMJDCzUMMnH-Jh2duaqdBuQxyj7_iav9SEhPPjCtVSvVnJtDefsteeplOlziQleooo89pSML1mWz5tBUKcEtX8WRfA4cJeT6joam4a4BTi2BpaDDqNzisyc7RfbHu7y5o9TICNk-GnYxw873-FqT1DBN_tErjlOGfG4WFRw_hM_mrQnfJZndg98-H40s5XpigQAwIiECdLHudEdkeGcEDDmpOwRSIN16acUzNvYP7anwn8tfY7-eCh534WQ=w828-h775-no?authuser=1"
     chat_id = message.chat.id
     bot.send_photo(chat_id=chat_id, photo=url)
 
 
 
 #===========================================================
-
+@bot.message_handler(commands=['FFF'])
+def fff(message):
+    markup = types.ForceReply(selective=False)
+    rep = ""
+    bot.send_message(message.chat.id, "Which Unit did you go to?", reply_markup=markup, reply = rep)
+    bot.send_message(message.chat.id, rep)
 
 
 
