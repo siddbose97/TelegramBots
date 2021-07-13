@@ -142,7 +142,7 @@ def qUsOutStep(message):
         qusout = message.text
         template.qusout = qusout
 
-        inspectionSummary = "*INSPECTION SUMMARY*" + "\n"
+        inspectionSummary = "*INSPECTION SUMMARY*" + "\n\n"
         camp = template.camp.upper() + "\n\n"
         quantityBooked = "QUANTITY BOOKED: " + "[" + template.qbooked + "]" + "\n"
         quantityChecked = "QUANTITY CHECKED: " + "[" + template.qchecked + "]" + "\n\n"
