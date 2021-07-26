@@ -228,7 +228,7 @@ def extraRMKStep(message):
         odd.rmk = rmk
         
 
-        unit = "Unit: " + odd.unit + "\n"
+        unit = "Unit: " + odd.unit.upper() + "\n"
         date = "Date: " + odd.date + "\n"
         wpnType = "Weapon Type: " + odd.wpnType + "\n"
         buttNum = "Butt Number: " + odd.buttNum + "\n"
@@ -242,13 +242,13 @@ def extraRMKStep(message):
         keys = list(oddTypes.keys())
         wpn = keys[int(splitting[0])-1]
         subKeys = list(oddTypes[wpn].keys())
-        location = subKeys[int(splitting[0])-1]
+        location = subKeys[int(splitting[1])-1]
 
         subSubKeys = list(oddTypes[wpn][location].values())
-        issue = subSubKeys[int(splitting[0])-1]
+        issue = subSubKeys[int(splitting[2])-1]
         issue = issue[3:]
 
-        odd.summary = wpn + ", " + location + ", " + issue + "\n"
+        odd.summary = wpn + ", " + location.upper().capitalize() + ", " + issue + "\n"
         summary = "Summary: " + str(odd.summary)
 
 
