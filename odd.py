@@ -69,11 +69,11 @@ oddTypes = {
             2:"2. Washer deficient",
             3:"3. Others"
         },
-        "BCA":{
-            1:"Bolt cam pin deficient",
-            2:"Extractor spring broken or deficient",
-            3:"Extractor pin broken or deficient",
-            4:"Others"
+        "BOLT CARRIER ASSEMBLY":{
+            1:"1. Bolt cam pin deficient",
+            2:"2. Extractor spring broken or deficient",
+            3:"3. Extractor pin broken or deficient",
+            4:"4. Others"
         },
         "RECEIVERS":
         {
@@ -105,7 +105,7 @@ oddTypes = {
 }
 
 SAR21Map = {1: "BARREL", 2: "SCOPE", 3: "CHARGING HANDLE", 4:"LAD", 5:"MUZZLE AND WASHER", \
-    6:"BCA", 7:"RECEIVERS", 8:"FC",9:"OTHER"}
+    6:"BOLT CARRIER ASSEMBLY", 7:"RECEIVERS", 8:"FC",9:"OTHER"}
 
 #=============================================================
 # Handle '/start' and '/help'
@@ -136,18 +136,7 @@ def unitStep(message):
         bot.reply_to(message, 'oooops')
 
 #enter weapon type here
-#enter date here
-
-# def dateStep(message):
-#     try: 
-#         chat_id = message.chat.id   
-#         date = message.text
-#         odd = oddDict[chat_id]
-#         odd.date = date
-#         msg = bot.reply_to(message, 'What is the butt number?')
-#         bot.register_next_step_handler(msg, buttStep)
-#     except Exception as e:
-#         bot.reply_to(message, 'oooops')
+#add condition where if the input is "quit" then quit
 
 
 def buttStep(message):
