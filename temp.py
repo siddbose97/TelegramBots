@@ -4,6 +4,7 @@ load_dotenv()
 
 import os
 import telebot
+import geopy.distance
 from telegram import Location, KeyboardButton
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, KeyboardButton
 
@@ -22,22 +23,26 @@ class AED:
         self.longitude = location.longitude
        
 
+locations = {
+    "nsdc": {
+        1: (1.4055524, 103.8182829),
+        2: (1.4067986, 103.8192924),
+        3: (1.4091958,103.8186530)
+
+    }
+
+}
 
 
 
 
 
-@bot.message_handler(commands=['start'])
-def start(message):
-    loc = telebot.types.KeyboardButton(text='Share Current Location', request_location=True)
-    not_loc = telebot.types.KeyboardButton(text='Static Map')
-    start = telebot.types.ReplyKeyboardMarkup(resize_keyboard = True, one_time_keyboard = True)
-    start.row(loc)
-    start.row(not_loc)
-    bot.send_message(message.chat.id, text='Hello, would you like to see your current location or a static map?', reply_markup=start)
 
-    #bot.send_message(message.chat.id, "Welcome to AED Location Bot, How Can I Help?")
-    
+
+
+
+
+
 
 @bot.message_handler(commands=['help'])
 def start(message):
@@ -51,6 +56,21 @@ def start(message):
     """)
     #bot.send_chat_action(message.chat.id, 'find_location')
 
+
+@bot.message_handler(commands=['start'])
+def start(message):
+    loc = telebot.types.KeyboardButton(text='Nearest AED', request_location=True)
+    not_loc = telebot.types.KeyboardButton(text='Static Map')
+    start = telebot.types.ReplyKeyboardMarkup(resize_keyboard = True, one_time_keyboard = True)
+    start.row(loc)
+    start.row(not_loc)
+    bot.send_message(message.chat.id, text='Hello, would you like to see your nearest AED or a static map?', reply_markup=start)
+
+    #bot.send_message(message.chat.id, "Welcome to AED Location Bot, How Can I Help?")
+    
+
+
+
     
 
 @bot.message_handler(content_types=['location'])
@@ -63,7 +83,19 @@ def currentLocation(message):
             aed = AED(message.location)
             aedDict[chat_id] = aed
             print(message.location)
-            bot.send_location(message.chat.id, aedDict[chat_id].latitude, aedDict[chat_id].longitude)
+            closestAED = (0,0)
+            minDist = 100000000000
+            for coords in locations["nsdc"].values():
+                #dist = geopy.distance.distance((aed.latitude, aed.longitude), coords).m
+                dist = geopy.distance.distance((1.408879, 103.818540), coords).m
+                print(dist)
+                if dist < minDist:
+                    minDist = dist
+                    closestAED = coords
+
+            bot.send_location(message.chat.id, closestAED[0], closestAED[1])
+            sendString = "The closest AED is at the above location, approximately " + str(round(minDist)) + "m away"
+            bot.send_message(message.chat.id,sendString )
     except Exception as e:
         bot.reply_to(message, 'oooops')
 
