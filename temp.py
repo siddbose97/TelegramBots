@@ -9,6 +9,24 @@ from telegram import Location, KeyboardButton
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, KeyboardButton
 
 
+"""
+Issues to solve for
+1. If for some reason the input is not one of the two buttons
+    a. Static Map:
+        1. input is not numeric (and between 1-11 if 11 camps)
+    b. Nearest AED:
+        2. 
+
+
+
+"""
+
+
+
+
+
+
+
 
 API_key = os.environ.get('aedAPI_KEY')
 bot = telebot.TeleBot(API_key)
@@ -64,14 +82,12 @@ mappingMapDict = {1:"nsdc", 2:"nsc", 3:"mandai hill", 4:"kc2", 5:"kc3", \
 @bot.message_handler(commands=['help'])
 def start(message):
     bot.send_message(message.chat.id, """ 
-    Use the /aed command followed by the camp name to find where AED's are located!
+    Welcome to AED Bot!
+    If you need to find the nearest AED or get a map of the AEDs at a certain camp use the /start command
 
-    Kranji Camp 2 = /aed kc2
-    Kranji Camp 3 = /aed kc3
-    Nee Soon Driclad Center = /aed nsdc
+    If you have any issues please contact 62FMD at 6AMB!
     
     """)
-    #bot.send_chat_action(message.chat.id, 'find_location')
 
 
 @bot.message_handler(commands=['start'])
@@ -81,7 +97,12 @@ def start(message):
     start = telebot.types.ReplyKeyboardMarkup(resize_keyboard = True, one_time_keyboard = True)
     start.row(loc)
     start.row(not_loc)
-    bot.send_message(message.chat.id, text='Hello, would you like to see your nearest AED or a static map?', reply_markup=start)
+    st = """
+    Hello, would you like to see your nearest AED or a static map? 
+    \n
+If you click Nearest AED, the bot will request your location!
+    """
+    bot.send_message(message.chat.id,text= st, reply_markup=start)
 
     #bot.send_message(message.chat.id, "Welcome to AED Location Bot, How Can I Help?")
     
@@ -94,7 +115,22 @@ def start(message):
 def currentLocation(message):
     try:
         chat_id = message.chat.id
-        
+        print("reached")
+       
+        one = telebot.types.KeyboardButton(text='NSDC')
+        two = telebot.types.KeyboardButton(text='NSC')
+        three = telebot.types.KeyboardButton(text='Mandai Hill')
+        four = telebot.types.KeyboardButton(text='KC2')
+        five = telebot.types.KeyboardButton(text='KC3')
+        six = telebot.types.KeyboardButton(text='Mowbray')
+        seven = telebot.types.KeyboardButton(text='Hendon')
+        eight = telebot.types.KeyboardButton(text='Clementi')
+        nine = telebot.types.KeyboardButton(text='Maju')
+        ten = telebot.types.KeyboardButton(text='Gombak')
+        eleven = telebot.types.KeyboardButton(text='Gedong')
+        locs = telebot.types.ReplyKeyboardMarkup(resize_keyboard = True, one_time_keyboard = True)
+   
+        locs.add(one, two, three, four, five, six, seven, eight, nine, ten, eleven)
 
         if message.location:
             aed = AED(message.location)
@@ -102,22 +138,9 @@ def currentLocation(message):
             print(message.location)
             sendString = """
             Which camp are you at?
-
-            Options are (please input number only):
-            1. nsdc
-            2. nsc
-            3. mandai hill
-            4. kc2
-            5. kc3
-            6. mowbray
-            7. hendon
-            8. clementi
-            9. maju
-            10. gombak
-            11. gedong
         """
             
-            msg = bot.send_message(message.chat.id,sendString )
+            msg = bot.send_message(message.chat.id,sendString, reply_markup=locs)
             bot.register_next_step_handler(msg, distanceCalculator)
         else:
             bot.send_message(message.chat.id,"Could not get user location, please try again" )
@@ -128,17 +151,18 @@ def currentLocation(message):
 def distanceCalculator(message):
     try:
         chat_id = message.chat.id
-        camp =  int(message.text)
+        
+        camp =  message.text.lower()
         aed = aedDict[chat_id]
         
-        if mappingMapDict[camp] in locations.keys():
+        if camp in locations.keys():
             closestAED = (0,0)
             minDist = 100000000000
-            for coords in locations[mappingMapDict[camp]].values():
+            for coords in locations[camp].values():
                 dist = geopy.distance.distance((aed.latitude, aed.longitude), coords).m
-                aed.aeds[dist] = coords
-                #dist = geopy.distance.distance((1.408879, 103.818540), coords).m
                 
+                #dist = geopy.distance.distance((1.405854, 103.818543), coords).m
+                aed.aeds[dist] = coords
                 if dist < minDist:
                     minDist = dist
                     closestAED = coords
@@ -149,7 +173,7 @@ def distanceCalculator(message):
             sleep(3)
             counter = 0
             for keys in sortedDist:
-                if counter > 1:
+                if counter > 1: # to limit to the 2 closest AEDs
                     break
                 bot.send_location(message.chat.id, aed.aeds[keys][0], aed.aeds[keys][1])
                 sendString = "The AED at the above location is approximately " + str(round(keys)) + "m away"
@@ -158,8 +182,11 @@ def distanceCalculator(message):
                 
                 sleep(0.5)
             finalString = "Stay Safe!"
+            bot.send_message(chat_id, "If you need any more information, please type in the /start command again!")
             bot.send_message(message.chat.id, finalString )
 
+
+            # bot.send_location(message.chat.id, 1.405854, 103.818543)
             # bot.send_location(message.chat.id, closestAED[0], closestAED[1])
             # sendString = "The closest AED is at the above location, approximately " + str(round(minDist)) + "m away"
             # bot.send_message(message.chat.id,sendString )
@@ -183,22 +210,25 @@ def checker (message):
 @bot.message_handler(func=checker)
 def staticMap(message):
     try:
+       
+
+        one = telebot.types.KeyboardButton(text='NSDC')
+        two = telebot.types.KeyboardButton(text='NSC')
+        three = telebot.types.KeyboardButton(text='Mandai Hill')
+        four = telebot.types.KeyboardButton(text='KC2')
+        five = telebot.types.KeyboardButton(text='KC3')
+        six = telebot.types.KeyboardButton(text='Mowbray')
+        seven = telebot.types.KeyboardButton(text='Hendon')
+        eight = telebot.types.KeyboardButton(text='Clementi')
+        nine = telebot.types.KeyboardButton(text='Maju')
+        ten = telebot.types.KeyboardButton(text='Gombak')
+        eleven = telebot.types.KeyboardButton(text='Gedong')
+        locs = telebot.types.ReplyKeyboardMarkup(resize_keyboard = True, one_time_keyboard = True)
+   
+        locs.add(one, two, three, four, five, six, seven, eight, nine, ten, eleven)
         msg = bot.reply_to(message, """\
         Which camp would you like a map for?
-
-        Options are (please input number only):
-        1. nsdc
-        2. nsc
-        3. mandai hill
-        4. kc2
-        5. kc3
-        6. mowbray
-        7. hendon
-        8. clementi
-        9. maju
-        10. gombak
-        11. gedong
-        """)
+        """, reply_markup=locs)
         bot.register_next_step_handler(msg, returnImage)
     except Exception as e:
         bot.reply_to(message, 'oooops')
@@ -206,12 +236,16 @@ def staticMap(message):
 def returnImage(message):
     try:
         chat_id = message.chat.id
-        msg = message.text
-        url = campMaps[mappingMapDict[int(msg)]]
-        bot.send_photo(chat_id=chat_id, photo=url)
+        msg = message.text.lower()
+        url = campMaps[msg]
+        
+        
         if url == badURL:
             errorString = "Sorry, support for this camp is not available yet!"
             bot.send_message(message.chat.id,errorString )
+        else:
+            bot.send_photo(chat_id=chat_id, photo=url)
+            bot.send_message(chat_id, "If you need any more information, please type in the /start command again!")
     except Exception as e:
         bot.reply_to(message, 'oooops')
 
