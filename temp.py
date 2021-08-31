@@ -39,7 +39,7 @@ campButtons = {
         "Maju" :telebot.types.KeyboardButton(text='Maju'),
         "Gombak" :telebot.types.KeyboardButton(text='Gombak'),
         "Gedong" :telebot.types.KeyboardButton(text='Gedong'),
-        "Quit" :telebot.types.KeyboardButton(text="QUIT")
+        "Quit" :telebot.types.KeyboardButton(text="RESTART")
 }
 
 
@@ -112,6 +112,7 @@ If you have any issues please contact 62FMD at 6AMB!
 #added value error exception but it may not be needed
 @bot.message_handler(commands=['start'])
 @bot.message_handler(func=lambda msg: msg.text == "/start")
+@bot.message_handler(func=lambda msg: msg.text == "RESTART")
 def start(message):
     try:
         
@@ -125,7 +126,7 @@ def start(message):
         welcomeString = """
         Hello, would you like to see your nearest AED or a static map?
 If you click Nearest AED, the bot will request your location!
-Click the QUIT button at any time to stop the bot!
+Click the RESTART button at any time to restart the commands!
         """
         bot.send_message(message.chat.id,text= welcomeString, reply_markup=start)
     except Exception:
@@ -144,7 +145,6 @@ def currentLocation(message):
         if message.location:
             aed = AED(message.location)
             aedDict[chat_id] = aed
-            print(message.location)
             sendString = """
             Which camp are you at?
         """
@@ -160,7 +160,7 @@ def currentLocation(message):
         else:
             raise ValueError
     except ValueError:
-       bot.send_message(message.chat.id,"Could not get user location, please try again" )
+       bot.send_message(message.chat.id,"Could not get user location, press /start to try again!" )
 
 
 #exception handling added for out of scope input
@@ -170,10 +170,9 @@ def distanceCalculator(message):
         aed = aedDict[chat_id]
 
         camp =  message.text.lower()
-        print(message.text)
         if message.text == "QUIT":
             raise Exception
-        elif message.text == "/start":
+        elif message.text == "/start" or message.text == "RESTART":
             start(message)
         elif camp not in campMaps.keys():
             raise ValueError
@@ -205,10 +204,10 @@ def distanceCalculator(message):
             finalString = "Stay Safe!"
             bot.send_message(chat_id, "If you need any more information, please type in the /start command again!")
             bot.send_message(message.chat.id, finalString )
-        elif camp == "/start":
+        elif camp == "/start" or message.text == "RESTART":
             pass
         else:
-            bot.send_message(message.chat.id,"Sorry, we currently don't have the coordinates of the AEDs in this camp!" )
+            bot.send_message(message.chat.id,"Sorry, we currently don't have the coordinates of the AEDs in this camp! Press /start to try again!" )
     
     #introducing exception handling if the input is not from the buttons
     except ValueError:
@@ -219,7 +218,6 @@ def distanceCalculator(message):
             errorString = "This input is not recognized! Press /start to try again!"
             bot.send_message(message.chat.id,errorString)
     except Exception:
-        print("here")
         bot.send_message(message.chat.id,"Have a wonderful day! Please press /start to try again!")
 
 
@@ -262,16 +260,16 @@ def returnImage(message):
             raise Exception
         elif msg in campMaps.keys():
             url = campMaps[msg]
-        elif message.text == "/start":
+        elif message.text == "/start" or message.text == "RESTART":
             start(message)
         else:
             raise ValueError
         
         if url == badURL:
-            errorString = "Sorry, support for this camp is not available yet!"
+            errorString = "Sorry, support for this camp is not available yet! Press /start to try again!"
             bot.send_photo(chat_id=chat_id, photo=url)
             bot.send_message(message.chat.id,errorString )
-        elif message.text == "/start":
+        elif message.text == "/start" or message.text == "RESTART":
             pass
         else:
             bot.send_photo(chat_id=chat_id, photo=url)
@@ -284,7 +282,6 @@ def returnImage(message):
             errorString = "This input is not recognized! Press /start to try again!"
             bot.send_message(message.chat.id,errorString)
     except Exception:
-        print("here1")
         bot.send_message(message.chat.id,"Have a wonderful day! Please press /start to try again!")
 
 @bot.message_handler(regexp="Quit")    
@@ -295,4 +292,4 @@ def qFunc(message):
         errorString = "Sorry something went wrong! Please press /start to try again!"
         bot.send_message(message.chat.id,errorString)
 
-bot.polling()
+bot.polling()   
